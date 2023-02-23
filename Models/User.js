@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 
 
 
-const User = mongoose.Schema(
+const User = new mongoose.Schema(
   {
     UserName: {
       default: 'null',
