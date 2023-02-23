@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 
-const PackageHistory =  mongoose.Schema(
+const PackageHistory = new  mongoose.Schema(
   {
     PackageOwner: {
       required:true,

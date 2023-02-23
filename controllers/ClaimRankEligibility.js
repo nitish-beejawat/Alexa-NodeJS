@@ -2,6 +2,7 @@ const User = require("../Models/User")
 const RenewalPurchasePackage = require("../Models/Renewal/RenewalPurchasePackage")
 const RankEligibilityClaim = require("../Models/History/RankEligibilityClaim")
 const Plan = require("../Models/Plan")
+const PackageHistory = require("../Models/History/PackageHistory");
 
 
 
@@ -15,6 +16,52 @@ exports.ClaimRankEligibility = async(req, res) => {
 
     const findRankEligibilityData = await RankEligibilityClaim.find({RankEligibilityClaimOwnerId:id})
 
+    // Ankan Code Starts Here...
+    const currentUser = await User.findById(id);
+
+    if(!currentUser) {
+        // Handle non exsistent user edge case
+    }
+
+    const currentSubUsers = await User.find({
+        UpperlineUser: currentUser.id
+    });
+
+    let totalData = {
+        users: 0,
+        bussiness: 0,
+    };
+
+    const bfsQueue = [];
+
+    currentSubUsers.forEach((sub) => {
+        bfsQueue.push(sub);
+    });
+
+    while(bfsQueue.length > 1) {
+        const currentUser = bfsQueue.shift();
+
+        const latestPackageHistory = await PackageHistory.findOne({
+            PackageOwner: currentUser.id
+        });
+
+        if(latestPackageHistory && Number(latestPackageHistory.PackagePrice) > 0) {
+            const currentUserPackage = Number(latestPackageHistory.PackagePrice);
+
+            totalData["bussiness"] += currentUserPackage;
+            totalData["users"] += 1;
+        }
+
+        const currentUsersSubs = await User.find({
+            UpperlineUser: currentUser.id
+        });
+
+        currentUsersSubs.forEach((sub) => {
+            bfsQueue.push(sub);
+        });
+    } 
+
+    // Ankan Code Ends Here...
 
     if (findRankEligibilityData.length !== 0) {
         return res.status(200).json({message:"Already Given Rank Eligibility"})
