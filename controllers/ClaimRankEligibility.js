@@ -3,6 +3,7 @@ const RenewalPurchasePackage = require("../Models/Renewal/RenewalPurchasePackage
 const RankEligibilityClaim = require("../Models/History/RankEligibilityClaim")
 const Plan = require("../Models/Plan")
 const PackageHistory = require("../Models/History/PackageHistory");
+const ShortRecord = require("../Models/ShortRecord");
 
 
 
@@ -59,48 +60,57 @@ exports.ClaimRankEligibility = async(req, res) => {
         currentUsersSubs.forEach((sub) => {
             bfsQueue.push(sub);
         });
+
+
     } 
+    console.log(totalData.users) // The total number of this user childs
+
+
+
+
 
     // Ankan Code Ends Here...
 
-    if (findRankEligibilityData.length !== 0) {
-        return res.status(200).json({message:"Already Given Rank Eligibility"})
-    }
+    // if (findRankEligibilityData.length !== 0) {
+    //     return res.status(200).json({message:"Already Given Rank Eligibility"})
+    // }
 
 
-    const MainUserData = await User.findById(id)
+    // const MainUserData = await User.findById(id)
 
-    const FindPackage = await Plan.findOne({ PackagePrice: MainUserData.PurchasedPackagePrice })
-
-
-    const NewWallet = Number(MainUserData.MainWallet) + Number(ClaimedReward)
+    // const FindPackage = await Plan.findOne({ PackagePrice: MainUserData.PurchasedPackagePrice })
 
 
-    await User.findByIdAndUpdate({ _id: id }, { MainWallet: NewWallet }) // giving reward
+    // const NewWallet = Number(MainUserData.MainWallet) + Number(ClaimedReward)
 
 
-    // finding renwal
-    const findOldReneal = await RenewalPurchasePackage.find({PackageOwner:id})
+    // await User.findByIdAndUpdate({ _id: id }, { MainWallet: NewWallet }) // giving reward
 
-    if (findOldReneal.length !== 0) {
 
-        await RenewalPurchasePackage.findByIdAndUpdate({_id:findOldReneal[0]._id},{RankEligibility:"false"})
+    // // finding renwal
+    // const findOldReneal = await RenewalPurchasePackage.find({PackageOwner:id})
+
+    // if (findOldReneal.length !== 0) {
+
+    //     await RenewalPurchasePackage.findByIdAndUpdate({_id:findOldReneal[0]._id},{RankEligibility:"false"})
         
-    }
+    // }
 
-    RankEligibilityClaim({
+    // RankEligibilityClaim({
 
-        RankEligibilityClaimOwnerId: MainUserData._id,
-        RankEligibilityClaimOwnerUserName: MainUserData.SponserCode,
-        RankEligibilityClaimOwnerEmail: MainUserData.EmailId,
-        PackageOwnName: FindPackage.PackageName,
-        PackageOwnPrice: FindPackage.PackagePrice,
-        ClaimedReward: ClaimedReward,
-        TotBusiness: TotalBusiness
+    //     RankEligibilityClaimOwnerId: MainUserData._id,
+    //     RankEligibilityClaimOwnerUserName: MainUserData.SponserCode,
+    //     RankEligibilityClaimOwnerEmail: MainUserData.EmailId,
+    //     PackageOwnName: FindPackage.PackageName,
+    //     PackageOwnPrice: FindPackage.PackagePrice,
+    //     ClaimedReward: ClaimedReward,
+    //     TotBusiness: TotalBusiness
 
-    }).save()
+    // }).save()
 
-   return res.status(200).json({ message: 'Claim Reward Done' })
+
+
+   return res.status(200).json(totalData.users)
 
 
 
