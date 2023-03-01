@@ -28,6 +28,8 @@ exports.ClaimRankEligibility = async(req, res) => {
         UpperlineUser: currentUser.id
     });
 
+
+
     let totalData = {
         users: 0,
         bussiness: 0,
@@ -39,12 +41,17 @@ exports.ClaimRankEligibility = async(req, res) => {
         bfsQueue.push(sub);
     });
 
-    while(bfsQueue.length > 1) {
+
+    // console.log(bfsQueue)
+
+    while(bfsQueue.length > 0) {
+        console.log("came in this queue")
         const currentUser = bfsQueue.shift();
 
         const latestPackageHistory = await PackageHistory.findOne({
             PackageOwner: currentUser.id
         });
+        console.log(latestPackageHistory)
 
         if(latestPackageHistory && Number(latestPackageHistory.PackagePrice) > 0) {
             const currentUserPackage = Number(latestPackageHistory.PackagePrice);
