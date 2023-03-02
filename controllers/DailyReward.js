@@ -141,7 +141,9 @@ exports.homes = async(req, res) => {
         const Got_Reward = Number(finalCal)*3/100
 
         const My_Wallet = Number(myOldWallet.MainWallet)
-        console.log("came in Sec")
+        console.log("Max_Cap => ",Max_Cap)
+        console.log("Got_Reward => ",Got_Reward)
+        console.log("My_Wallet => ",My_Wallet)
 
 
         if (Got_Reward + My_Wallet >= Max_Cap) {
@@ -251,7 +253,9 @@ exports.homes = async(req, res) => {
         const Got_Reward = Number(finalCal)
 
         const My_Wallet = Number(myOldWallet.MainWallet)
-        console.log("came in Sec")
+        console.log("Max_Cap => ",Max_Cap)
+        console.log("Got_Reward => ",Got_Reward)
+        console.log("My_Wallet => ",My_Wallet)
 
 
         if (Got_Reward + My_Wallet >= Max_Cap) {
@@ -275,24 +279,34 @@ exports.homes = async(req, res) => {
               
             }
 
-            const createRecord = await LykaFastBonusHis({
-              BonusOwner: list[i].id,
-              FormPackage: list[i].name,
-              PackagePercantage: per,
-              Amount: Add_Money_In_Wallet
-            }).save()
+            if (Add_Money_In_Wallet !== 0) {
+              
+              const createRecord = await LykaFastBonusHis({
+                BonusOwner: list[i].id,
+                FormPackage: list[i].name,
+                PackagePercantage: per,
+                Amount: Add_Money_In_Wallet
+              }).save()
+            await User.findByIdAndUpdate({ _id: list[i].id }, { MainWallet: Number(myWallete)+Number(Add_Money_In_Wallet) })
 
+              
+            }
           
         }else{
 
           var Add_Money_In_Wallet = Got_Reward + My_Wallet
 
-          const createRecord = await LykaFastBonusHis({
-            BonusOwner: list[i].id,
-            FormPackage: list[i].name,
-            PackagePercantage: per,
-            Amount: Got_Reward
-          }).save()
+          if (Add_Money_In_Wallet !== 0) {
+
+            const createRecord = await LykaFastBonusHis({
+              BonusOwner: list[i].id,
+              FormPackage: list[i].name,
+              PackagePercantage: per,
+              Amount: Got_Reward
+            }).save()
+            await User.findByIdAndUpdate({ _id: list[i].id }, { MainWallet: Number(myWallete)+Number(Got_Reward) })
+
+          }
         }
 
 
@@ -350,7 +364,9 @@ exports.homes = async(req, res) => {
         const Got_Reward = Number(finalCal)
 
         const My_Wallet = Number(myOldWallet.MainWallet)
-        console.log("came in Sec")
+        console.log("Max_Cap => ",Max_Cap)
+        console.log("Got_Reward => ",Got_Reward)
+        console.log("My_Wallet => ",My_Wallet)
 
 
         if (Got_Reward + My_Wallet >= Max_Cap) {
@@ -376,12 +392,43 @@ exports.homes = async(req, res) => {
               
             }
 
+
+            if (Add_Money_In_Wallet !== 0) {
+              
+
             const createRecord = await DailyBonus({
               BonusOwner: list[i].id,
               FormPackage: list[i].name,
               PackagePercantage: per,
               Amount: Add_Money_In_Wallet
             }).save()
+
+
+
+
+            const findShortRecord = await ShortRecord.findOne({RecordOwner:list[i].id})
+
+
+        if (findShortRecord) {
+
+          let sum = Number(findShortRecord.DailyStakig) + Number(Add_Money_In_Wallet)
+
+          const updateValue = await ShortRecord.findByIdAndUpdate({_id:findShortRecord._id},{DailyStakig:sum})
+
+        }else{
+
+          const createShortRecord = await ShortRecord({
+            RecordOwner:list[i].id,
+            DailyStakig:Add_Money_In_Wallet
+          }).save()
+
+        }
+
+
+
+
+          }
+
 
           
         }else{
@@ -402,23 +449,7 @@ exports.homes = async(req, res) => {
 
 
 
-        const findShortRecord = await ShortRecord.findOne({RecordOwner:list[i].id})
-
-
-        if (findShortRecord) {
-
-          let sum = Number(findShortRecord.DailyStakig) + Number(finalCal)
-
-          const updateValue = await ShortRecord.findByIdAndUpdate({_id:findShortRecord._id},{DailyStakig:sum})
-
-        }else{
-
-          const createShortRecord = await ShortRecord({
-            RecordOwner:list[i].id,
-            DailyStakig:finalCal
-          }).save()
-
-        }
+        
 
 
       }
@@ -436,7 +467,9 @@ exports.homes = async(req, res) => {
         const Got_Reward = Number(finalCal)
 
         const My_Wallet = Number(myOldWallet.MainWallet)
-        console.log("came in Sec")
+        console.log("Max_Cap => ",Max_Cap)
+        console.log("Got_Reward => ",Got_Reward)
+        console.log("My_Wallet => ",My_Wallet)
 
 
         if (Got_Reward + My_Wallet >= Max_Cap) {
@@ -460,31 +493,38 @@ exports.homes = async(req, res) => {
               
             }
 
+            if (Add_Money_In_Wallet !== 0) {
 
+              const createRecord = await LykaFastBonusHis({
+                BonusOwner: list[i].id,
+                FormPackage: list[i].name,
+                PackagePercantage: per,
+                Amount: Add_Money_In_Wallet
+              }).save()
+            await User.findByIdAndUpdate({ _id: list[i].id }, { MainWallet: Number(myWallete)+Number(Add_Money_In_Wallet) })
 
-            const createRecord = await LykaFastBonusHis({
-              BonusOwner: list[i].id,
-              FormPackage: list[i].name,
-              PackagePercantage: per,
-              Amount: Add_Money_In_Wallet
-            }).save()
-
+              
+            }
           
         }else{
 
           var Add_Money_In_Wallet = Got_Reward + My_Wallet
 
-          const createRecord = await LykaFastBonusHis({
-            BonusOwner: list[i].id,
-            FormPackage: list[i].name,
-            PackagePercantage: per,
-            Amount: Got_Reward
-          }).save()
+          if (Add_Money_In_Wallet !== 0) {
+
+            
+            const createRecord = await LykaFastBonusHis({
+              BonusOwner: list[i].id,
+              FormPackage: list[i].name,
+              PackagePercantage: per,
+              Amount: Got_Reward
+            }).save()
+            await User.findByIdAndUpdate({ _id: list[i].id }, { MainWallet: Number(myWallete)+Number(Got_Reward) })
+          }
         }
 
 
 
-    await User.findByIdAndUpdate({ _id: list[i].id }, { MainWallet: Number(myWallete)+Number(Add_Money_In_Wallet) })
 
 
 
@@ -527,6 +567,10 @@ exports.homes = async(req, res) => {
 
         const My_Wallet = Number(myOldWallet.MainWallet)
 
+        console.log("Max_Cap => ",Max_Cap)
+        console.log("Got_Reward => ",Got_Reward)
+        console.log("My_Wallet => ",My_Wallet)
+
         if (Got_Reward + My_Wallet >= Max_Cap) {
 
            var Add_Money_In_Wallet = Max_Cap - My_Wallet 
@@ -547,12 +591,14 @@ exports.homes = async(req, res) => {
               }).save()
               
             }
-            const createRecord = await DailyBonus({
-              BonusOwner: list[i].id,
-              FormPackage: list[i].name,
-              PackagePercantage: per,
-              Amount: Add_Money_In_Wallet
-            }).save()
+            if (Add_Money_In_Wallet !== 0) {
+              const createRecord = await DailyBonus({
+                BonusOwner: list[i].id,
+                FormPackage: list[i].name,
+                PackagePercantage: per,
+                Amount: Add_Money_In_Wallet
+              }).save()
+            }
 
           
         }else{
