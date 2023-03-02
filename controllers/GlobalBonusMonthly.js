@@ -9,6 +9,7 @@ const LykaFastBonusHis = require("../Models/History/LykaFastBonusHis")
 const RenewalPurchasePackage = require("../Models/Renewal/RenewalPurchasePackage")
 const RebuyBonus = require("../Models/Bonus/RebuyBonus")
 const ShortRecord = require("../Models/ShortRecord")
+const LapWallet = require("../Models/LapWallet")
 
 
 
