@@ -1,10 +1,5 @@
 const mongoose = require('mongoose')
 
-
-
-
-
-
 const ShortRecord = mongoose.Schema({
 
     RecordOwner:{
@@ -47,6 +42,6 @@ const ShortRecord = mongoose.Schema({
 {
   timestamps: true
 })
-module.exports = mongoose.model("ShortRecord", ShortRecord);
+module.exports = mongoose.model("MyShortRecord", ShortRecord);
 
 // export default mongoose.models.ShortRecord || mongoose.model('ShortRecord', ShortRecord)

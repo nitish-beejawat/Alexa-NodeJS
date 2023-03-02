@@ -12,8 +12,6 @@ const ShortRecord = require("../Models/ShortRecord")
 exports.homes = async(req, res) => {
 
 
-
-  
   var list = []
 
   const findPackage = await PackageHistory.find()
