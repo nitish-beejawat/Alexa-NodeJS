@@ -12,6 +12,8 @@ const ShortRecord = require("../Models/ShortRecord")
 exports.homes = async(req, res) => {
 
 
+  
+  
   var list = []
 
   const findPackage = await PackageHistory.find()
@@ -24,23 +26,103 @@ exports.homes = async(req, res) => {
   findPackage.map(hit => {
     return list.push({ id: hit.PackageOwner, price: hit.PackagePrice, name: hit.PackageName })
   })
-
+  
   for (let i = 0; i < list.length; i++) {
 
+    const investedAmount = list[i].price
 
-
+    
+    var per = 0.3
 
 
     const myOldWallet = await User.findById(list[i].id)
 
-    const investedAmount = list[i].price
+    
+
+    if (myOldWallet.UpperlineUser !== "null") {
+    
+      const upperlineUserDatas = await User.findById(myOldWallet.UpperlineUser)
+      
+      console.log(upperlineUserDatas._id)
+      const FindPackages = await PackageHistory.findOne({PackageOwner:upperlineUserDatas._id})
+
+      console.log(FindPackages)
+  
+      const Max_Caps = Number(FindPackages.PackagePrice)*300/100
+      var finalCals = (Number(investedAmount) * per) / 100
+  
+      const Got_Rewards = Number(finalCals)*3/100
+  
+      const My_Wallets = Number(myOldWallet.MainWallet)
+  
+  
+  
+  
+  
+      if (Got_Rewards + My_Wallets >= Max_Caps) {
+  
+        continue;
+  
+      }
+
+    }else{
+
+
+
+      const upperlineUserDatas = await User.findById(myOldWallet._id)
+      
+      const investedAmount = list[i].price
+  
+      const FindPackages = await PackageHistory.findOne({PackageOwner:upperlineUserDatas._id})
+  
+      const Max_Caps = Number(FindPackages.PackagePrice)*300/100
+      var finalCals = (Number(investedAmount) * per) / 100
+  
+      const Got_Rewards = Number(finalCals)*3/100
+  
+      const My_Wallets = Number(myOldWallet.MainWallet)
+  
+      
+  
+  
+  
+      if (Got_Rewards + My_Wallets >= Max_Caps) {
+  
+        continue;
+  
+      }
+
+
+
+
+
+
+    }  
+    
+
+    
+
+    // var refDef = finalCal*3/100
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     var findFastBonus = await LykaFastBonus.find({ FastBonusCandidate: list[i].id })
 
     const findRenewalBonus = await RenewalPurchasePackage.findOne({PackageOwner:list[i].id})
 
 
-    var per = 0.3
 
     var FindMainUserReferals = []
 
@@ -112,7 +194,7 @@ exports.homes = async(req, res) => {
     var finalWallete = Number(myWallete) + Number(finalCal)
 
 
-    console.log("working till here")
+    
 
     
     
@@ -120,7 +202,7 @@ exports.homes = async(req, res) => {
       const upperlineUserData = await User.findById(myOldWallet.UpperlineUser)
 
 
-      console.log("the user is => "+myOldWallet._id)
+      
       const FindPackagesforThis = await PackageHistory.findOne({PackageOwner:myOldWallet._id})
 
 
@@ -141,9 +223,9 @@ exports.homes = async(req, res) => {
         const Got_Reward = Number(finalCal)*3/100
 
         const My_Wallet = Number(myOldWallet.MainWallet)
-        console.log("Max_Cap => ",Max_Cap)
-        console.log("Got_Reward => ",Got_Reward)
-        console.log("My_Wallet => ",My_Wallet)
+        
+        
+        
 
 
         if (Got_Reward + My_Wallet >= Max_Cap) {
@@ -212,8 +294,8 @@ exports.homes = async(req, res) => {
     
           let sum = (parseFloat(findShortRecord.RebuyBonus) + parseFloat(Got_Reward)).toFixed(2)
          
-          console.log(sum)
-          console.log(typeof(sum))
+          
+          
     
           const updateValue = await ShortRecord.findByIdAndUpdate({_id:findShortRecord._id},{RebuyBonus:sum})
     
@@ -253,9 +335,9 @@ exports.homes = async(req, res) => {
         const Got_Reward = Number(finalCal)
 
         const My_Wallet = Number(myOldWallet.MainWallet)
-        console.log("Max_Cap => ",Max_Cap)
-        console.log("Got_Reward => ",Got_Reward)
-        console.log("My_Wallet => ",My_Wallet)
+        
+        
+        
 
 
         if (Got_Reward + My_Wallet >= Max_Cap) {
@@ -364,16 +446,16 @@ exports.homes = async(req, res) => {
         const Got_Reward = Number(finalCal)
 
         const My_Wallet = Number(myOldWallet.MainWallet)
-        console.log("Max_Cap => ",Max_Cap)
-        console.log("Got_Reward => ",Got_Reward)
-        console.log("My_Wallet => ",My_Wallet)
+        
+        
+        
 
 
         if (Got_Reward + My_Wallet >= Max_Cap) {
 
            var Add_Money_In_Wallet = Max_Cap - My_Wallet 
 
-           console.log("Add_Money_In_Wallet => "+Add_Money_In_Wallet)
+           
 
            const Lap_Income = Got_Reward > Add_Money_In_Wallet?Got_Reward-Add_Money_In_Wallet:Add_Money_In_Wallet-Got_Reward 
 
@@ -467,9 +549,9 @@ exports.homes = async(req, res) => {
         const Got_Reward = Number(finalCal)
 
         const My_Wallet = Number(myOldWallet.MainWallet)
-        console.log("Max_Cap => ",Max_Cap)
-        console.log("Got_Reward => ",Got_Reward)
-        console.log("My_Wallet => ",My_Wallet)
+        
+        
+        
 
 
         if (Got_Reward + My_Wallet >= Max_Cap) {
@@ -567,9 +649,9 @@ exports.homes = async(req, res) => {
 
         const My_Wallet = Number(myOldWallet.MainWallet)
 
-        console.log("Max_Cap => ",Max_Cap)
-        console.log("Got_Reward => ",Got_Reward)
-        console.log("My_Wallet => ",My_Wallet)
+        
+        
+        
 
         if (Got_Reward + My_Wallet >= Max_Cap) {
 
@@ -646,7 +728,7 @@ exports.homes = async(req, res) => {
     }
 
 
-    console.log('done')
+    
   }
 
   res.json(list)
