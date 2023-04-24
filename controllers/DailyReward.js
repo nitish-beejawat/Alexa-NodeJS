@@ -507,6 +507,7 @@ exports.homes = async (req, res) => {
         const findShortRecord = findPackage[i].shortRecordDetail;
         let check = ShortRecordArr.length == 0 ? -1 : ShortRecordArr.findIndex((value) => value.RecordOwner === findPackage[i].PackageOwner)
         let checkInUpdate = UpdateShortRecordArr.length == 0 ? -1 : UpdateShortRecordArr.findIndex((value) => value?.updateOne.filter.RecordOwner === findPackage[i].PackageOwner)
+        console.log("checkUpdate ============= ", UpdateShortRecordArr[checkInUpdate].updateOne)
 
         if (check == -1 && !findShortRecord) {
           ShortRecordArr.push({
@@ -524,13 +525,13 @@ exports.homes = async (req, res) => {
         } else {
           if (findShortRecord) {
             let total = 0;
-            if(UpdateShortRecordArr[checkUpdate].updateOne.update.$set["PowerStaing"] === undefined) {
+            if(UpdateShortRecordArr[checkInUpdate] && UpdateShortRecordArr[checkInUpdate].updateOne.update.$set["PowerStaing"] === undefined) {
               total = Number(findShortRecord.PowerStaing) + Number(finalCal);
-              UpdateShortRecordArr[checkUpdate].updateOne.update.$set.PowerStaing = 0;
+              UpdateShortRecordArr[checkInUpdate].updateOne.update.$set.PowerStaing = 0;
             } else {
               total = Number(finalCal);
             }
-            UpdateShortRecordArr[checkUpdate].updateOne.update.$set.PowerStaing += parseFloat(total)
+            UpdateShortRecordArr[checkInUpdate]["updateOne"]["update"]["$set"]["PowerStaing"] += parseFloat(total)
           } else {
             let sum = Number(ShortRecordArr[check].PowerStaing) + Number(finalCal)
             ShortRecordArr[check].PowerStaing = sum
@@ -551,6 +552,7 @@ exports.homes = async (req, res) => {
 
           let check = LapWalletArr.length == 0 ? -1 : LapWalletArr.findIndex((value) => value.BonusOwner === findPackage[i].PackageOwner)
           let checkUpdate = UpdateLapWalletArr.length == 0 ? -1 : UpdateLapWalletArr.findIndex((value) => value.updateOne.filter.BonusOwner === findPackage[i].PackageOwner)
+          console.log("checkUpdate ============= ", checkUpdate)
 
           if (check == -1 && !fetch_Last_Lap_Wallet) {
             LapWalletArr.push({
@@ -728,13 +730,13 @@ exports.homes = async (req, res) => {
         } else {
           if (findShortRecord) {
             let total = 0;
-            if(UpdateShortRecordArr[checkUpdate].updateOne.update.$set["PowerStaing"] === undefined) {
+            if(UpdateShortRecordArr[checkInUpdate].updateOne.update.$set["PowerStaing"] === undefined) {
               total = Number(findShortRecord.PowerStaing) + Number(finalCal);
-              UpdateShortRecordArr[checkUpdate].updateOne.update.$set.PowerStaing = 0;
+              UpdateShortRecordArr[checkInUpdate].updateOne.update.$set.PowerStaing = 0;
             } else {
               total = Number(finalCal);
             }
-            UpdateShortRecordArr[checkUpdate].updateOne.update.$set.PowerStaing += parseFloat(total)
+            UpdateShortRecordArr[checkInUpdate].updateOne.update.$set.PowerStaing += parseFloat(total)
           } else {
             let sum = Number(ShortRecordArr[check].PowerStaing) + Number(finalCal)
             ShortRecordArr[check].PowerStaing = sum
