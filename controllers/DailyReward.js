@@ -280,23 +280,37 @@ exports.homes = async (req, res) => {
         }
       })
 
-      if (FindMainUserReferals?.length >= 10) {
-        per = 5
-      } else if (FindMainUserReferals?.length >= 8) {
-        per = 4
-      } else if (FindMainUserReferals?.length >= 6) {
-        per = 3
-      } else if (FindMainUserReferals?.length >= 4) {
-        per = 2
-      } else if (FindMainUserReferals?.length >= 2) {
+      if (FindMainUserReferals.length == 2 || FindMainUserReferals.length == 3) {
         per = 1
-      }
+     
+      }else if(FindMainUserReferals.length == 4 || FindMainUserReferals.length == 5){
+        per = 2
+       
+      }else if(FindMainUserReferals.length == 6 || FindMainUserReferals.length == 7){
+        per = 3
+    
+      }else if(FindMainUserReferals.length == 8 || FindMainUserReferals.length == 9){
+        per = 4
+        
+      }else if(FindMainUserReferals.length >= 10){
+        per = 5
       
-      if (findRenewalBonus == null || typeof findRenewalBonus == "undefined") {
-      } else if (findRenewalBonus !== null && findRenewalBonus?.DirectReferalDone == "false") {
+      }
+
+      
+
+
+
+      if (findRenewalBonus==null) {      
+        
+      }else if(findRenewalBonus!==null&&findRenewalBonus.DirectReferalDone == "false"){
+       
         per = 0.3
-      } else if (findRenewalBonus?.DirectReferalDone == "false") {
+      }else if(findRenewalBonus.DirectReferalDone == "false"){
+     
         per = 0.3
+      }else{
+       
       }
     }
 
@@ -445,12 +459,21 @@ exports.homes = async (req, res) => {
           }
 
           if (Add_Money_In_Wallet !== 0) {
-            LykaFastBonusHisArr.push({
-              BonusOwner: findPackage[i].id,
-              FormPackage: findPackage[i].PackageName,
-              PackagePercantage: per,
-              Amount: Add_Money_In_Wallet
-            })
+            if(per == 0.3){    
+              DailyBonusArr.push({
+                BonusOwner: findPackage[i].id,
+                FormPackage: findPackage[i].PackageName,
+                PackagePercantage: per,
+                Amount: Add_Money_In_Wallet
+              })
+            } else {
+              LykaFastBonusHisArr.push({
+                BonusOwner: findPackage[i].id,
+                FormPackage: findPackage[i].PackageName,
+                PackagePercantage: per,
+                Amount: Add_Money_In_Wallet
+              })
+            }
 
             let checkUpdate = UpdateUserDetailArr.length == 0 ? -1 : UpdateUserDetailArr.findIndex((value) => value.updateOne.filter._id.toString() == findPackage[i].PackageOwner)
 
@@ -469,12 +492,21 @@ exports.homes = async (req, res) => {
           var Add_Money_In_Wallet = Got_Reward + My_Wallet
 
           if (Add_Money_In_Wallet !== 0) {
-            LykaFastBonusHisArr.push({
-              BonusOwner: findPackage[i].PackageOwner,
-              FormPackage: findPackage[i].PackageName,
-              PackagePercantage: per,
-              Amount: Got_Reward
-            })
+            if(per == 0.3){    
+              DailyBonusArr.push({
+                BonusOwner: findPackage[i].PackageOwner,
+                FormPackage: findPackage[i].PackageName,
+                PackagePercantage: per,
+                Amount: Got_Reward
+              })
+            } else {
+              LykaFastBonusHisArr.push({
+                BonusOwner: findPackage[i].PackageOwner,
+                FormPackage: findPackage[i].PackageName,
+                PackagePercantage: per,
+                Amount: Got_Reward
+              })
+            }
 
             let checkUpdate = UpdateUserDetailArr.length == 0 ? -1 : UpdateUserDetailArr.findIndex((value) => value.updateOne.filter._id.toString() == findPackage[i].PackageOwner)
 
@@ -507,34 +539,54 @@ exports.homes = async (req, res) => {
         const findShortRecord = findPackage[i].shortRecordDetail;
         let check = ShortRecordArr.length == 0 ? -1 : ShortRecordArr.findIndex((value) => value.RecordOwner === findPackage[i].PackageOwner)
         let checkInUpdate = UpdateShortRecordArr.length == 0 ? -1 : UpdateShortRecordArr.findIndex((value) => value?.updateOne.filter.RecordOwner === findPackage[i].PackageOwner)
-        console.log("checkUpdate ============= ", UpdateShortRecordArr[checkInUpdate].updateOne)
+        let fieldValue = "PowerStaing";
+
+        if(per == 0.3){ 
+          fieldValue = "DailyStakig";
+        }
 
         if (check == -1 && !findShortRecord) {
-          ShortRecordArr.push({
-            RecordOwner: findPackage[i].PackageOwner,
-            PowerStaing: finalCal
-          })
+          if(per == 0.3){
+            ShortRecordArr.push({
+              RecordOwner: findPackage[i].PackageOwner,
+              DailyStakig: finalCal
+            })
+          } else {
+            ShortRecordArr.push({
+              RecordOwner: findPackage[i].PackageOwner,
+              PowerStaing: finalCal
+            })
+          }
         } else if (checkInUpdate == -1 && findShortRecord) {
-          let sum = Number(findShortRecord.PowerStaing) + Number(finalCal)
-          UpdateShortRecordArr?.push({
-            "updateOne": {
-              "filter": { "RecordOwner": findPackage[i].PackageOwner },
-              "update": { $set: { "PowerStaing": sum } }
-            }
-          })
+          let sum = Number(findShortRecord[fieldValue]) + Number(finalCal)
+          if(per == 0.3){
+            UpdateShortRecordArr?.push({
+              "updateOne": {
+                "filter": { "RecordOwner": findPackage[i].PackageOwner },
+                "update": { $set: { "DailyStakig": sum } }
+              }
+            })
+          } else {
+            UpdateShortRecordArr?.push({
+              "updateOne": {
+                "filter": { "RecordOwner": findPackage[i].PackageOwner },
+                "update": { $set: { "PowerStaing": sum } }
+              }
+            })
+          }
         } else {
           if (findShortRecord) {
             let total = 0;
-            if(UpdateShortRecordArr[checkInUpdate] && UpdateShortRecordArr[checkInUpdate].updateOne.update.$set["PowerStaing"] === undefined) {
-              total = Number(findShortRecord.PowerStaing) + Number(finalCal);
-              UpdateShortRecordArr[checkInUpdate].updateOne.update.$set.PowerStaing = 0;
+            if(UpdateShortRecordArr[checkInUpdate] && UpdateShortRecordArr[checkInUpdate].updateOne.update.$set[fieldValue] === undefined) {
+              total = Number(findShortRecord[fieldValue]) + Number(finalCal);
+              UpdateShortRecordArr[checkInUpdate].updateOne.update.$set[fieldValue] = 0;
             } else {
               total = Number(finalCal);
             }
-            UpdateShortRecordArr[checkInUpdate]["updateOne"]["update"]["$set"]["PowerStaing"] += parseFloat(total)
+            UpdateShortRecordArr[checkInUpdate]["updateOne"]["update"]["$set"][fieldValue] += parseFloat(total)
           } else {
-            let sum = Number(ShortRecordArr[check].PowerStaing) + Number(finalCal)
-            ShortRecordArr[check].PowerStaing = sum
+            let sum = Number(ShortRecordArr[check][fieldValue]) + Number(finalCal)
+            ShortRecordArr[check][fieldValue] = sum
           }
         }
       } else {
@@ -603,13 +655,13 @@ exports.homes = async (req, res) => {
             } else {
               if (findShortRecord) {
                 let total = 0;
-                if(UpdateShortRecordArr[checkUpdate].updateOne.update.$set["DailyStakig"] === undefined) {
+                if(UpdateShortRecordArr[checkInUpdate].updateOne.update.$set["DailyStakig"] === undefined) {
                   total = Number(findShortRecord.DailyStakig) + Number(Add_Money_In_Wallet);
-                  UpdateShortRecordArr[checkUpdate].updateOne.update.$set.DailyStakig = 0;
+                  UpdateShortRecordArr[checkInUpdate].updateOne.update.$set.DailyStakig = 0;
                 } else {
                   total = Number(Add_Money_In_Wallet);
                 }
-                UpdateShortRecordArr[checkUpdate].updateOne.update.$set.DailyStakig += total
+                UpdateShortRecordArr[checkInUpdate].updateOne.update.$set.DailyStakig += total
               } else {
                 let sum = Number(ShortRecordArr[check].DailyStakig) + Number(Add_Money_In_Wallet)
                 ShortRecordArr[check].DailyStakig = sum
@@ -665,12 +717,21 @@ exports.homes = async (req, res) => {
             }
           }
           if (Add_Money_In_Wallet !== 0) {
-            LykaFastBonusHisArr.push({
-              BonusOwner: findPackage[i].PackageOwner,
-              FormPackage: findPackage[i].PackageName,
-              PackagePercantage: per,
-              Amount: Add_Money_In_Wallet
-            })
+            if(per == 0.3){    
+              DailyBonusArr.push({
+                BonusOwner: findPackage[i].PackageOwner,
+                FormPackage: findPackage[i].PackageName,
+                PackagePercantage: per,
+                Amount: Add_Money_In_Wallet
+              })
+            } else {
+              LykaFastBonusHisArr.push({
+                BonusOwner: findPackage[i].PackageOwner,
+                FormPackage: findPackage[i].PackageName,
+                PackagePercantage: per,
+                Amount: Add_Money_In_Wallet
+              })
+            }
             
             let checkUpdate = UpdateUserDetailArr.length == 0 ? -1 : UpdateUserDetailArr.findIndex((value) => value.updateOne.filter._id.toString() == findPackage[i].PackageOwner)
 
@@ -688,12 +749,21 @@ exports.homes = async (req, res) => {
         } else {
           var Add_Money_In_Wallet = Got_Reward + My_Wallet
           if (Add_Money_In_Wallet !== 0) {
-            LykaFastBonusHisArr.push({
-              BonusOwner: findPackage[i].PackageOwner,
-              FormPackage: findPackage[i].PackageName,
-              PackagePercantage: per,
-              Amount: Got_Reward
-            })
+            if(per == 0.3){    
+              DailyBonusArr.push({
+                BonusOwner: findPackage[i].PackageOwner,
+                FormPackage: findPackage[i].PackageName,
+                PackagePercantage: per,
+                Amount: Got_Reward
+              })
+            } else {
+              LykaFastBonusHisArr.push({
+                BonusOwner: findPackage[i].PackageOwner,
+                FormPackage: findPackage[i].PackageName,
+                PackagePercantage: per,
+                Amount: Got_Reward
+              })
+            }
             
             let checkUpdate = UpdateUserDetailArr.length == 0 ? -1 : UpdateUserDetailArr.findIndex((value) => value.updateOne.filter._id.toString() == findPackage[i].PackageOwner)
 
@@ -713,33 +783,54 @@ exports.homes = async (req, res) => {
         const findShortRecord = findPackage[i].shortRecordDetail;
         let check = ShortRecordArr.length == 0 ? -1 : ShortRecordArr.findIndex((value) => value.RecordOwner === findPackage[i].PackageOwner)
         let checkInUpdate = UpdateShortRecordArr.length == 0 ? -1 : UpdateShortRecordArr.findIndex((value) => value?.updateOne.filter.RecordOwner === findPackage[i].PackageOwner)
+        let fieldValue = "PowerStaing";
+
+        if(per == 0.3){ 
+          fieldValue = "DailyStakig";
+        }
 
         if (check == -1 && !findShortRecord) {
-          ShortRecordArr.push({
-            RecordOwner: findPackage[i].PackageOwner,
-            PowerStaing: finalCal
-          })
+          if(per == 0.3){  
+            ShortRecordArr.push({
+              RecordOwner: findPackage[i].PackageOwner,
+              DailyStakig: finalCal
+            })
+          } else {
+            ShortRecordArr.push({
+              RecordOwner: findPackage[i].PackageOwner,
+              PowerStaing: finalCal
+            })
+          }
         } else if (checkInUpdate == -1 && findShortRecord) {
-          let sum = Number(findShortRecord.PowerStaing) + Number(finalCal)
-          UpdateShortRecordArr?.push({
-            "updateOne": {
-              "filter": { "RecordOwner": findPackage[i].PackageOwner },
-              "update": { $set: { "PowerStaing": sum } }
-            }
-          })
+          let sum = Number(findShortRecord[fieldValue]) + Number(finalCal)
+          if(per == 0.3){ 
+            UpdateShortRecordArr?.push({
+              "updateOne": {
+                "filter": { "RecordOwner": findPackage[i].PackageOwner },
+                "update": { $set: { "DailyStakig": sum } }
+              }
+            })
+          } else {
+            UpdateShortRecordArr?.push({
+              "updateOne": {
+                "filter": { "RecordOwner": findPackage[i].PackageOwner },
+                "update": { $set: { "PowerStaing": sum } }
+              }
+            })
+          }
         } else {
           if (findShortRecord) {
             let total = 0;
-            if(UpdateShortRecordArr[checkInUpdate].updateOne.update.$set["PowerStaing"] === undefined) {
-              total = Number(findShortRecord.PowerStaing) + Number(finalCal);
-              UpdateShortRecordArr[checkInUpdate].updateOne.update.$set.PowerStaing = 0;
+            if(UpdateShortRecordArr[checkInUpdate].updateOne.update.$set[fieldValue] === undefined) {
+              total = Number(findShortRecord[fieldValue]) + Number(finalCal);
+              UpdateShortRecordArr[checkInUpdate].updateOne.update.$set[fieldValue] = 0;
             } else {
               total = Number(finalCal);
             }
-            UpdateShortRecordArr[checkInUpdate].updateOne.update.$set.PowerStaing += parseFloat(total)
+            UpdateShortRecordArr[checkInUpdate].updateOne.update.$set[fieldValue] += parseFloat(total)
           } else {
-            let sum = Number(ShortRecordArr[check].PowerStaing) + Number(finalCal)
-            ShortRecordArr[check].PowerStaing = sum
+            let sum = Number(ShortRecordArr[check][fieldValue]) + Number(finalCal)
+            ShortRecordArr[check][fieldValue] = sum
           }
         }
       } else {
@@ -830,13 +921,13 @@ exports.homes = async (req, res) => {
         } else {
           if (findShortRecord) {
             let total = 0;
-            if(UpdateShortRecordArr[checkUpdate].updateOne.update.$set["DailyStakig"] === undefined) {
+            if(UpdateShortRecordArr[checkInUpdate].updateOne.update.$set["DailyStakig"] === undefined) {
               total = Number(findShortRecord.DailyStakig) + Number(finalCal);
-              UpdateShortRecordArr[checkUpdate].updateOne.update.$set.DailyStakig = 0;
+              UpdateShortRecordArr[checkInUpdate].updateOne.update.$set.DailyStakig = 0;
             } else {
               total = Number(finalCal);
             }
-            UpdateShortRecordArr[checkUpdate].updateOne.update.$set.DailyStakig += parseFloat(total)
+            UpdateShortRecordArr[checkInUpdate].updateOne.update.$set.DailyStakig += parseFloat(total)
           } else {
             let sum = Number(ShortRecordArr[check].DailyStakig) + Number(finalCal)
             ShortRecordArr[check].DailyStakig = sum
