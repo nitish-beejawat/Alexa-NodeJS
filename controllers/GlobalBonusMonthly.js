@@ -81,7 +81,7 @@ exports.GlobalBonusMonthly = async(req, res) => {
   
   const rankEligibleForThatPackage = await RankEligibilityClaim.find({ClaimedReward:mainUserPackagePrice})
 
-  console.log("=================================================================================================")
+  
 
 
 
@@ -130,18 +130,18 @@ exports.GlobalBonusMonthly = async(req, res) => {
   }
   
 
-  console.log("Percantage Given ===> "+percantage)
+  
 
-  console.log("TotalBusiness ===> "+TotalBusiness)
+  
   
   
   var est1 = Number(TotalBusiness) * percantage /100
   
-  console.log("Estimated ===> "+est1)
+  
 
 
-  console.log("eligibial members ===> "+Number(memberEligible))
-  console.log("Give Reward ===> "+Number(est1)/Number(memberEligible))
+  
+  
   var givre = Number(est1)/Number(memberEligible)
 
 
@@ -192,14 +192,14 @@ exports.GlobalBonusMonthly = async(req, res) => {
 
     const Max_Cap = Number(FindPackage.PackagePrice) * 300 / 100
 
-    console.log("Max_Cap => " + Max_Cap)
+    
 
     const Got_Reward = Number(givre)
 
-    console.log("Got_Reward => " + Got_Reward)
+    
     const My_Wallet = Number(userDataid.MainWallet)
-    console.log("My_Wallet => " + My_Wallet)
-    console.log("came in first")
+    
+    
 
 
     if (Got_Reward + My_Wallet >= Max_Cap) {
@@ -273,7 +273,7 @@ exports.GlobalBonusMonthly = async(req, res) => {
     const findShortRecord = await ShortRecord.findOne({RecordOwner:id})
 
 
-    console.log(givre)
+    
 
 
 
@@ -283,8 +283,8 @@ exports.GlobalBonusMonthly = async(req, res) => {
 
       let sum = (parseFloat(findShortRecord.GobalPoolBonus) + parseFloat(givre)).toFixed(2)
      
-      console.log(sum)
-      console.log(typeof(sum))
+      
+      
 
       const updateValue = await ShortRecord.findByIdAndUpdate({_id:findShortRecord._id},{GobalPoolBonus:sum})
 

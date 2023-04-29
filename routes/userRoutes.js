@@ -17,6 +17,7 @@ const { DailyReward7 } = require("../controllers/SplittedApi/DailyReward7")
 const { DailyReward8 } = require("../controllers/SplittedApi/DailyReward8")
 const { DailyReward9 } = require("../controllers/SplittedApi/DailyReward9")
 const { DailyReward10 } = require("../controllers/SplittedApi/DailyReward10")
+const { CountMyLeftRightDirects } = require("../controllers/CountMyLeftRightDirects")
 
 
 
@@ -28,6 +29,7 @@ router.post("/matchiingBonus", MatchingBonus)
 router.post("/globalBonusMonthly", GlobalBonusMonthly)
 router.post("/ClaimRankEligibility", ClaimRankEligibility)
 router.post("/CountMyTeam", CountMyTeam)
+router.post("/CountMyLeftRightDirects", CountMyLeftRightDirects)
 
 
 // Splitted API Endpoints
