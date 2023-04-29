@@ -7,6 +7,7 @@ const LapWallet = require("../Models/LapWallet")
 const RenewalPurchasePackage = require("../Models/Renewal/RenewalPurchasePackage")
 const RebuyBonus = require("../Models/Bonus/RebuyBonus")
 const ShortRecord = require("../Models/ShortRecord")
+const PurchasePackageInvoice = require("../Models/Invoice/PurchasePackageInvoice")
 
 exports.homes = async (req, res) => {
   let LapWalletArr = []
@@ -315,8 +316,13 @@ exports.homes = async (req, res) => {
         // }
       })
 
-      let userLength = FindMainUserReferals.length;
-      // console.log("userLength 11111111 ============= ", userLength, findMainUser)
+      const TotalBuy = await PurchasePackageInvoice.find({
+        PackageOwner: findPackage[i].PackageOwner,
+        Type: "Repurchased"
+      }).count()
+
+      let userLength = FindMainUserReferals.length - TotalBuy;
+      console.log("userLength 11111111 ============= ", userLength, FindMainUserReferals.length, TotalBuy, findPackage[i].PackageOwner)
       // if(findPackage[i].Type!="Basic"){
       //   if(userLength>1){
       //     userLength = userLength - 1
@@ -376,7 +382,7 @@ exports.homes = async (req, res) => {
 
           const Max_Cap = Number(FindPackage.PackagePrice) * 300 / 100
           const Got_Reward = Number(finalCal) * 3 / 100
-          const My_Wallet = Number(myOldWallet.MainWallet)
+          const My_Wallet = Number(upperlineUserDatas.MainWallet)
           var Add_Money_In_Wallet = 0;
 
           if (Got_Reward + My_Wallet >= Max_Cap) {
@@ -435,6 +441,21 @@ exports.homes = async (req, res) => {
           }
 
           if(Add_Money_In_Wallet>0){
+            let checkUpdate = UpdateUserDetailArr.length == 0 ? -1 : UpdateUserDetailArr.findIndex((value) => value.updateOne.filter._id.toString() == upperlineUserDatas._id)
+
+            if(checkUpdate == -1){
+              UpdateUserDetailArr?.push({
+                "updateOne": {
+                  "filter": { "_id": upperlineUserDatas._id },
+                  "update": { $set: { "MainWallet": My_Wallet + Add_Money_In_Wallet } }
+                }
+              })
+            } else {
+              UpdateUserDetailArr[checkUpdate].updateOne.update.$set.MainWallet += Add_Money_In_Wallet
+            }
+          }
+
+          if(Add_Money_In_Wallet>0){
             const findShortRecord = findPackage[i].UpperlineUserShortDetails;
             let check = ShortRecordArr.length == 0 ? -1 : ShortRecordArr.findIndex((value) => value.RecordOwner === findPackage[i].UpperlineUserDetail._id.toString())
             let checkUpdate = UpdateShortRecordArr.length == 0 ? -1 : UpdateShortRecordArr.findIndex((value) => value?.updateOne.filter.RecordOwner === findPackage[i].UpperlineUserDetail._id.toString())
@@ -448,7 +469,7 @@ exports.homes = async (req, res) => {
             } else if (checkUpdate == -1 && findShortRecord) {
               // console.log("findShortRecord.RebuyBonus ========  =========== ------ ", findShortRecord.RebuyBonus)
               let sum = Number((parseFloat(findShortRecord.RebuyBonus) + parseFloat(Add_Money_In_Wallet)).toFixed(2))
-              // console.log("sum ========  =========== ------ ", sum)
+              console.log("sum 1111 ========  =========== ------ ", sum, findPackage[i].PackageOwner)
               UpdateShortRecordArr?.push({
                 "updateOne": {
                   "filter": { "RecordOwner": upperlineUserDatas._id.toString() },

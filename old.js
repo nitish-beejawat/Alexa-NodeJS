@@ -309,6 +309,9 @@ exports.homes = async (req, res) => {
         UpperlineUser: findMainUser,
         PurchasedPackagePrice: {
           $gte: Number(MainUserPackagePrice)
+        },
+        createdAt: {
+          $gte: findPackage[i].createdAt
         }
       })
 
