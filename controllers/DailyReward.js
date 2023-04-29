@@ -311,18 +311,18 @@ exports.homes = async (req, res) => {
         PurchasedPackagePrice: {
           $gte: Number(MainUserPackagePrice)
         },
-        // createdAt: {
-        //   $gte: findPackage[i].createdAt
-        // }
+        createdAt: {
+          $gte: findPackage[i].createdAt
+        }
       })
+      console.log("FindMainUserReferals ============= ", FindMainUserReferals.length)
 
-      const TotalBuy = await PurchasePackageInvoice.find({
-        PackageOwner: findPackage[i].PackageOwner,
-        Type: "Repurchased"
-      }).count()
+      // const TotalBuy = await PurchasePackageInvoice.find({
+      //   PackageOwner: findPackage[i].PackageOwner,
+      //   Type: "Repurchased"
+      // }).count()
 
-      let userLength = FindMainUserReferals.length - TotalBuy;
-      console.log("userLength 11111111 ============= ", userLength, FindMainUserReferals.length, TotalBuy, findPackage[i].PackageOwner)
+      let userLength = findPackage[i].Type == "Basic" ? FindMainUserReferals.length : (FindMainUserReferals.length>0 ? FindMainUserReferals.length - 1 : 0);
       // if(findPackage[i].Type!="Basic"){
       //   if(userLength>1){
       //     userLength = userLength - 1
@@ -347,9 +347,16 @@ exports.homes = async (req, res) => {
         per = 5
 
       }
+      console.log("userLength per ============= ", per)
 
-
-
+      if(myOldWallet?.PreviousPercentage > 0) {
+        if(per<1){
+          per = Number(myOldWallet?.PreviousPercentage);
+        } else {
+          per = per + Number(myOldWallet?.PreviousPercentage);
+        }
+      }
+      console.log("userLength 11111111 ============= ", userLength, FindMainUserReferals.length, findPackage[i].PackageOwner, per, myOldWallet?.PreviousPercentage)
 
 
       if (findRenewalBonus==null) {      
