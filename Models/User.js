@@ -89,6 +89,11 @@ const User = new mongoose.Schema(
     UserEarnPercantage:{
       type: 'String',
       default:"0%"
+    },
+    PreviousPercentage:{
+      default: 0,
+      type: 'Number',
+      required:false
     }
 
   },

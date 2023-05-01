@@ -1,7 +1,9 @@
-import mongoose from "mongoose";
+const mongoose = require('mongoose')
 
 
-const PurchasePackageInvoice = mongoose.Schema({
+
+const PurchasePackageInvoice = new mongoose.Schema(
+    {
 
     PackageOwner: {
         required: true,
@@ -39,4 +41,5 @@ const PurchasePackageInvoice = mongoose.Schema({
     {
         timestamps: true
     })
-export default mongoose.models.PurchasePackageInvoice || mongoose.model('PurchasePackageInvoice', PurchasePackageInvoice)
+    module.exports = mongoose.model("purchasepackageinvoices", PurchasePackageInvoice);
+// export default mongoose.models.PurchasePackageInvoice || mongoose.model('PurchasePackageInvoice', PurchasePackageInvoice)

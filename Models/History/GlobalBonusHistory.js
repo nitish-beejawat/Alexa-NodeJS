@@ -19,6 +19,6 @@ const GlobalBonusHistory = mongoose.Schema(
     timestamps: true
   }
 )
-module.exports = mongoose.model("GlobalBonusHistory", GlobalBonusHistory);
+module.exports = mongoose.model("GlobalBonusHistoryn", GlobalBonusHistory);
 
 // export default mongoose.models.GlobalBonusHistory || mongoose.model('GlobalBonusHistory', GlobalBonusHistory)

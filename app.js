@@ -17,7 +17,7 @@ app.use(express.urlencoded({ extended: true }))
 connectToDB();
 console.log("came here")
 
-app.use("", userRouter)
+app.use("/api", userRouter)
 
 
 module.exports = app;
