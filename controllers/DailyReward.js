@@ -725,6 +725,8 @@ exports.homes = async (req, res) => {
 
           if (Add_Money_In_Wallet > 0) {
             // console.log("DailyBonusArr 33333333 ============= ", Add_Money_In_Wallet, findPackage[i].PackageOwner)
+            console.log("coming here")
+
             DailyBonusArr.push({
               BonusOwner: findPackage[i].PackageOwner,
               FormPackage: findPackage[i].PackageName,
@@ -768,7 +770,7 @@ exports.homes = async (req, res) => {
         } else {
           Add_Money_In_Wallet = Got_Reward
           // console.log("DailyBonusArr 444444444 ============= ", Add_Money_In_Wallet, findPackage[i].PackageOwner)
-          DailyBonusArr.push({
+          LykaFastBonusHisArr.push({
             BonusOwner: findPackage[i].PackageOwner,
             FormPackage: findPackage[i].PackageName,
             PackagePercantage: per,
@@ -1050,6 +1052,9 @@ exports.homes = async (req, res) => {
 
   // console.log(ShortRecordArr, "3")
   // console.log(JSON.stringify(UpdateUserDetailArr), "3")
+
+  console.log(ShortRecordArr)
+
 
   await LapWallet.insertMany(LapWalletArr)
   await RebuyBonus.insertMany(RebuyBonusArr)
