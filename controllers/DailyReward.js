@@ -166,14 +166,6 @@ exports.homes = async (req, res) => {
         Renewal_Detail: { $arrayElemAt: ['$Renewal_Detail', 0] }
       }
     },
-    // {
-    //   $lookup: {
-    //     from: 'renewalpurchasepackages',
-    //     localField: 'PackageOwner',
-    //     foreignField: 'PackageOwner',
-    //     as: 'Renewal_Detail'
-    //   }
-    // },
     {
       $unwind: {
         path: "$Renewal_Detail",
