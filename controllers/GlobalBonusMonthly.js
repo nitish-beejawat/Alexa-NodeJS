@@ -99,9 +99,9 @@ exports.GlobalBonusMonthly = async (req, res) => {
 
   const totalBusiness = RankBonusHistoryData.length ? RankBonusHistoryData[0].TotalBusiness : 0;
 
-  console.log("users.length ========== ", users.length)
 
   for (let index = 0; index < users.length; index++) {
+    console.log("users.length ========== ", users[index])
     const PRICE_LOOKUP_TABLE = {
       250: {
         percentage: 2,
@@ -155,8 +155,16 @@ exports.GlobalBonusMonthly = async (req, res) => {
 
     let percantage = percentage;
 
+    const My_Wallet = Number(users[index].MainWallet);
+    var capping = Number(users[index].PurchasedPackagePrice) * 300/100;
     var est1 = Number(totalBusiness) * percantage / 100
     var givre = Number(est1) / Number(memberEligible)
+
+    if(My_Wallet + givre > capping){
+      givre = givre - (My_Wallet + givre - capping)
+    }
+
+    console.log("checks ----- ======== ", My_Wallet, givre, capping)
 
     // const esDate = new Date(start)
 
@@ -197,7 +205,7 @@ exports.GlobalBonusMonthly = async (req, res) => {
 
     if(givre>0) {
       console.log("index ------- ====== ", index)
-      const My_Wallet = Number(users[index].MainWallet);
+      
       UpdateUserDetailArr?.push({
         "updateOne": {
           "filter": { "_id": users[index]._id },
