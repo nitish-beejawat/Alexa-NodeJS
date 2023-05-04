@@ -38,10 +38,14 @@ const ShortRecord = mongoose.Schema({
         type:"Number",
         default:0
     },
+    isEligibalForMatching:{
+        type:"Bool",
+        default:true
+    },
 },
 {
   timestamps: true
 })
-module.exports = mongoose.model("MyShortRecord", ShortRecord);
+module.exports = mongoose.model("MyShortRecordsds", ShortRecord);
 
 // export default mongoose.models.ShortRecord || mongoose.model('ShortRecord', ShortRecord)

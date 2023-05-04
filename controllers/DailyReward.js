@@ -82,7 +82,7 @@ exports.homes = async (req, res) => {
     },
     {
       $lookup: {
-        from: 'packagehis',
+        from: 'packagehistries',
         localField: 'upperLineUserId',
         foreignField: 'PackageOwner',
         as: 'UpperlineUserPackageDetails'
@@ -103,7 +103,7 @@ exports.homes = async (req, res) => {
     },
     {
       $lookup: {
-        from: 'myshortrecords',
+        from: 'myshortrecordsds',
         localField: 'upperLineUserId',
         foreignField: 'RecordOwner',
         as: 'UpperlineUserShortDetails'
@@ -166,14 +166,6 @@ exports.homes = async (req, res) => {
         Renewal_Detail: { $arrayElemAt: ['$Renewal_Detail', 0] }
       }
     },
-    // {
-    //   $lookup: {
-    //     from: 'renewalpurchasepackages',
-    //     localField: 'PackageOwner',
-    //     foreignField: 'PackageOwner',
-    //     as: 'Renewal_Detail'
-    //   }
-    // },
     {
       $unwind: {
         path: "$Renewal_Detail",
@@ -210,7 +202,7 @@ exports.homes = async (req, res) => {
     },
     {
       $lookup: {
-        from: 'myshortrecords',
+        from: 'myshortrecordsds',
         localField: 'PackageOwner',
         foreignField: 'RecordOwner',
         as: 'shortRecordDetail'
@@ -268,7 +260,7 @@ exports.homes = async (req, res) => {
       // console.log("upperlineUserDatas._id ========== ---------- ", upperlineUserDatas._id)
 
       const FindPackages = findPackage[i].UpperlineUserPackageDetails
-      // console.log("FindPackages ========== ---------- ", FindPackages)
+      console.log("FindPackages ========== ---------- ", upperlineUserDatas)
 
       const Max_Caps = Number(FindPackages.PackagePrice) * 300 / 100
       var finalCals = (Number(investedAmount) * per) / 100
@@ -505,7 +497,7 @@ exports.homes = async (req, res) => {
     }
 
     if (findRenewalBonus !== null && findRenewalBonus?.DirectReferalDone == "true") {
-      if (FindMainUserReferals.length >= 2) {
+      if (per>=1) {
         const FindPackage = findPackage[i];
 
         const Max_Cap = Number(FindPackage.PackagePrice) * 300 / 100
@@ -725,12 +717,31 @@ exports.homes = async (req, res) => {
 
           if (Add_Money_In_Wallet > 0) {
             // console.log("DailyBonusArr 33333333 ============= ", Add_Money_In_Wallet, findPackage[i].PackageOwner)
-            DailyBonusArr.push({
-              BonusOwner: findPackage[i].PackageOwner,
-              FormPackage: findPackage[i].PackageName,
-              PackagePercantage: per,
-              Amount: Add_Money_In_Wallet
-            })
+            console.log("coming here")
+            
+            if(per == 0.3){    
+              // console.log("DailyBonusArr 111111111 ============= ", Add_Money_In_Wallet, findPackage[i].PackageOwner)
+              DailyBonusArr.push({
+                BonusOwner: findPackage[i].PackageOwner,
+                FormPackage: findPackage[i].PackageName,
+                PackagePercantage: per,
+                Amount: Add_Money_In_Wallet
+              })
+            } else {
+              // console.log("LykaFastBonusHisArr 1111111111 ============= ", Add_Money_In_Wallet, findPackage[i].PackageOwner)
+              LykaFastBonusHisArr.push({
+                BonusOwner: findPackage[i].PackageOwner,
+                FormPackage: findPackage[i].PackageName,
+                PackagePercantage: per,
+                Amount: Add_Money_In_Wallet
+              })
+            }
+            // DailyBonusArr.push({
+            //   BonusOwner: findPackage[i].PackageOwner,
+            //   FormPackage: findPackage[i].PackageName,
+            //   PackagePercantage: per,
+            //   Amount: Add_Money_In_Wallet
+            // })
 
             const findShortRecord = findPackage[i].shortRecordDetail;
             let check = ShortRecordArr.length == 0 ? -1 : ShortRecordArr.findIndex((value) => value.RecordOwner === findPackage[i].PackageOwner)
@@ -768,16 +779,33 @@ exports.homes = async (req, res) => {
         } else {
           Add_Money_In_Wallet = Got_Reward
           // console.log("DailyBonusArr 444444444 ============= ", Add_Money_In_Wallet, findPackage[i].PackageOwner)
-          DailyBonusArr.push({
-            BonusOwner: findPackage[i].PackageOwner,
-            FormPackage: findPackage[i].PackageName,
-            PackagePercantage: per,
-            Amount: Got_Reward
-          })
+          if(per == 0.3){    
+            // console.log("DailyBonusArr 111111111 ============= ", Add_Money_In_Wallet, findPackage[i].PackageOwner)
+            DailyBonusArr.push({
+              BonusOwner: findPackage[i].PackageOwner,
+              FormPackage: findPackage[i].PackageName,
+              PackagePercantage: per,
+              Amount: Got_Reward
+            })
+          } else {
+            // console.log("LykaFastBonusHisArr 1111111111 ============= ", Add_Money_In_Wallet, findPackage[i].PackageOwner)
+            LykaFastBonusHisArr.push({
+              BonusOwner: findPackage[i].PackageOwner,
+              FormPackage: findPackage[i].PackageName,
+              PackagePercantage: per,
+              Amount: Got_Reward
+            })
+          }
+          // DailyBonusArr.push({
+          //   BonusOwner: findPackage[i].PackageOwner,
+          //   FormPackage: findPackage[i].PackageName,
+          //   PackagePercantage: per,
+          //   Amount: Got_Reward
+          // })
         }
       }
     } else {
-      if (FindMainUserReferals.length >= 2) {
+      if (per>=1) {
         const FindPackage = findPackage[i];
 
         const Max_Cap = Number(FindPackage.PackagePrice) * 300 / 100
@@ -980,22 +1008,56 @@ exports.homes = async (req, res) => {
 
           if (Add_Money_In_Wallet > 0) {
             // console.log("DailyBonusArr 777777777 ============= ", Add_Money_In_Wallet, findPackage[i].PackageOwner)
-            DailyBonusArr.push({
-              BonusOwner: findPackage[i].PackageOwner,
-              FormPackage: findPackage[i].PackageName,
-              PackagePercantage: per,
-              Amount: Add_Money_In_Wallet
-            })
+            if(per == 0.3){    
+              // console.log("DailyBonusArr 111111111 ============= ", Add_Money_In_Wallet, findPackage[i].PackageOwner)
+              DailyBonusArr.push({
+                BonusOwner: findPackage[i].PackageOwner,
+                FormPackage: findPackage[i].PackageName,
+                PackagePercantage: per,
+                Amount: Add_Money_In_Wallet
+              })
+            } else {
+              // console.log("LykaFastBonusHisArr 1111111111 ============= ", Add_Money_In_Wallet, findPackage[i].PackageOwner)
+              LykaFastBonusHisArr.push({
+                BonusOwner: findPackage[i].PackageOwner,
+                FormPackage: findPackage[i].PackageName,
+                PackagePercantage: per,
+                Amount: Add_Money_In_Wallet
+              })
+            }
+            // DailyBonusArr.push({
+            //   BonusOwner: findPackage[i].PackageOwner,
+            //   FormPackage: findPackage[i].PackageName,
+            //   PackagePercantage: per,
+            //   Amount: Add_Money_In_Wallet
+            // })
           }
         } else {
           Add_Money_In_Wallet = Got_Reward
           // console.log("DailyBonusArr 888888888 ============= ", Add_Money_In_Wallet, findPackage[i].PackageOwner)
-          DailyBonusArr.push({
-            BonusOwner: findPackage[i].PackageOwner,
-            FormPackage: findPackage[i].PackageName,
-            PackagePercantage: per,
-            Amount: Got_Reward
-          })
+          if(per == 0.3){    
+            // console.log("DailyBonusArr 111111111 ============= ", Add_Money_In_Wallet, findPackage[i].PackageOwner)
+            DailyBonusArr.push({
+              BonusOwner: findPackage[i].PackageOwner,
+              FormPackage: findPackage[i].PackageName,
+              PackagePercantage: per,
+              Amount: Got_Reward
+            })
+          } else {
+            // console.log("LykaFastBonusHisArr 1111111111 ============= ", Add_Money_In_Wallet, findPackage[i].PackageOwner)
+            LykaFastBonusHisArr.push({
+              BonusOwner: findPackage[i].PackageOwner,
+              FormPackage: findPackage[i].PackageName,
+              PackagePercantage: per,
+              Amount: Got_Reward
+            })
+          }
+          // DailyBonusArr.push({
+          //   BonusOwner: findPackage[i].PackageOwner,
+          //   FormPackage: findPackage[i].PackageName,
+          //   PackagePercantage: per,
+          //   Amount: Got_Reward
+          // })
         }
         if(Add_Money_In_Wallet > 0){    
           let checkUpdate = UpdateUserDetailArr.length == 0 ? -1 : UpdateUserDetailArr.findIndex((value) => value.updateOne.filter._id.toString() == findPackage[i].PackageOwner)
@@ -1050,6 +1112,9 @@ exports.homes = async (req, res) => {
 
   // console.log(ShortRecordArr, "3")
   // console.log(JSON.stringify(UpdateUserDetailArr), "3")
+
+  console.log(ShortRecordArr)
+
 
   await LapWallet.insertMany(LapWalletArr)
   await RebuyBonus.insertMany(RebuyBonusArr)

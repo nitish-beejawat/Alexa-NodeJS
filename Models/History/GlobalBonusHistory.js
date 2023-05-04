@@ -14,6 +14,10 @@ const GlobalBonusHistory = mongoose.Schema(
       require: true,
       type: 'String'
     },
+    CompanyBusiness: {
+      require: true,
+      type: 'String'
+    },
   },
   {
     timestamps: true

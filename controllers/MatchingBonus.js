@@ -1,7 +1,8 @@
 const PackageHistory = require("../Models/History/PackageHistory")
 const User = require("../Models/User")
 const MatchingBonusHistory = require("../Models/History/MatchingBonusHistory")
-
+const ShortRecord = require("../Models/ShortRecord")
+// const EligibalPeopleForMatchingBonus = require("../Models/Bonus/MatchingBonus/EligibalPeopleForMatchingBonus")
 
 
 const findTotalBussiness = async (userId, totalBussinessCache) => {
@@ -65,155 +66,114 @@ const findTotalBussiness = async (userId, totalBussinessCache) => {
 exports.MatchingBonus = async (req, res) => {
 
 
-
-
-
-
     const FindAllUsers = await User.find()
 
     const totalBussinessCache = {};
 
     for (let index = 0; index < FindAllUsers.length; index++) {
 
-
         var checkIfUserAlreadyOwnAnyMatchingBonus = await MatchingBonusHistory.findOne({ BonusOwner: FindAllUsers[index]._id })
+
 
         const FindMainUserPackage = await PackageHistory.findOne({ PackageOwner: FindAllUsers[index]._id, createdAt: { $gte: new Date((new Date().getTime() - (7 * 24 * 60 * 60 * 1000))) } })
 
-        console.log("This is hit ===> ")
-        console.log(FindMainUserPackage)
 
-        if (FindMainUserPackage !== null) {
+        if (FindMainUserPackage && FindMainUserPackage.Type2 == "Repurchased") {
 
 
+            if (FindMainUserPackage !== null) {
+
+                if (checkIfUserAlreadyOwnAnyMatchingBonus !== null) {
+                    var subLastValue = Number(checkIfUserAlreadyOwnAnyMatchingBonus.ForwardedValue)
+                } else {
+                    var subLastValue = 0
+                }
+
+                var PackPrice = FindMainUserPackage.PackagePrice
 
 
-            if (checkIfUserAlreadyOwnAnyMatchingBonus !== null) {
-                var subLastValue = Number(checkIfUserAlreadyOwnAnyMatchingBonus.ForwardedValue)
-            } else {
-                var subLastValue = 0
-            }
+
+                const findUserDirects = await User.find({
+                    UpperlineUser: FindAllUsers[index]._id,
+                    createdAt: { $gte: new Date(FindMainUserPackage.createdAt) }
+                })
 
 
 
-            var PackPrice = FindMainUserPackage.PackagePrice
 
 
-            const findUserDirects = await User.find({ UpperlineUser: FindAllUsers[index]._id })
+                if (findUserDirects.length !== 0) {
 
-            if (findUserDirects.length !== 0) {
+                    var LeftWall = 0
+                    var LeftWallId = ""
+                    var RightWall = 0
+                    var RightWallId = ""
 
-                var LeftWall = 0
-                var LeftWallId = ""
-                var RightWall = 0
-                var RightWallId = ""
+                    for (let index = 0; index < findUserDirects.length; index++) {
 
-                for (let index = 0; index < findUserDirects.length; index++) {
+                        if (findUserDirects[index].Position == "Right") {
 
-                    if (findUserDirects[index].Position == "Right") {
+                            LeftWall = LeftWall + Number(findUserDirects[index].PurchasedPackagePrice)
+                            LeftWallId = findUserDirects[index]._id
+                        }
+                        if (findUserDirects[index].Position == "Left") {
 
-                        LeftWall = LeftWall + Number(findUserDirects[index].PurchasedPackagePrice)
-                        LeftWallId = findUserDirects[index]._id
-                    }
-                    if (findUserDirects[index].Position == "Left") {
+                            RightWall = RightWall + Number(findUserDirects[index].PurchasedPackagePrice)
+                            RightWallId = findUserDirects[index]._id
 
-                        RightWall = RightWall + Number(findUserDirects[index].PurchasedPackagePrice)
-                        RightWallId = findUserDirects[index]._id
-
+                        }
                     }
                 }
-            }
 
-            if (LeftWall >= Number(PackPrice) && RightWall >= Number(PackPrice)) {
+                console.log("LeftWall => " + LeftWall)
+                console.log("RightWall => " + RightWall)
+                if (LeftWall >= Number(PackPrice) && RightWall >= Number(PackPrice)) {
 
-                console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx =>")
-                console.log("yes he is eligible => " + FindAllUsers[index]._id)
-                console.log("in this left there is => " + LeftWall)
-                console.log("in this left there is => " + RightWall)
-                console.log("the total goal is => " + PackPrice)
-                console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx =>")
+                    console.log("he is satisfying this block")
 
 
+                        // const findThisUserData = await User.findById(FindAllUsers[index]._id)
 
-                // this is second loop we are checking
+                        const currentUserBussiness = await findTotalBussiness(FindAllUsers[index]._id, totalBussinessCache);
 
-
-
-                // const findThisUserData = await User.findById(FindAllUsers[index]._id)
-
-                const currentUserBussiness = await findTotalBussiness(FindAllUsers[index]._id, totalBussinessCache);
-
-                // console.log(currentUserBussiness)
-
-
-
-                let leftBusiness = currentUserBussiness.data.leftIncome
-                let rightBusiness = currentUserBussiness.data.rightIncome
+                        // 
+    
+    
+    
+                        let leftBusiness = currentUserBussiness.data.leftIncome
+                        let rightBusiness = currentUserBussiness.data.rightIncome
+    
+    
+    
 
 
-
-                console.log("This is sec time this user => " + FindAllUsers[index]._id)
-
-                console.log("second time this user Left =>" + leftBusiness)
-                console.log("second time this user Righ =>" + rightBusiness)
-
-                if (leftBusiness >= Number(PackPrice) && rightBusiness >= Number(PackPrice)) {
-
-                    console.log("user purchased pack => " + Number(PackPrice))
                     var combo = 0
 
                     if (leftBusiness < rightBusiness) {
 
 
-                        console.log("came in first blocks")
-
                         combo = Number(leftBusiness) + Number(subLastValue)
                         var subtractForwardValue = rightBusiness - leftBusiness
 
                     } else if (rightBusiness < leftBusiness) {
-                        console.log("came in second blocks")
 
                         combo = Number(rightBusiness) + Number(subLastValue)
                         var subtractForwardValue = leftBusiness - rightBusiness
 
                     } else if (rightBusiness == leftBusiness) {
-                        console.log("came in second blocks")
 
                         combo = Number(rightBusiness)
                         var subtractForwardValue = 0
 
                     }
 
-
-
-
-
-                    console.log("this is the number ===> " + combo)
                     var packPercantage = Number(combo) * 8 / 100
-
-
-
-
-
-
-
-
-                    console.log("leftBusiness => " + leftBusiness)
-                    console.log("rightBusiness => " + rightBusiness)
-
-                    console.log("Yes he is eligible for matching bonus")
 
                     const GiveMatchingBonus = await User.findById(FindAllUsers[index]._id)
 
                     const userWallet = Number(GiveMatchingBonus.MainWallet) + Number(packPercantage)
 
-
-
-                    // console.log(packPercantage)
-
-
                     const ProvideMatchingBonus = await User.findByIdAndUpdate({ _id: FindAllUsers[index]._id }, { MainWallet: userWallet })
-
 
                     const CreateRecord = await MatchingBonusHistory({
                         BonusOwner: FindAllUsers[index]._id,
@@ -222,8 +182,6 @@ exports.MatchingBonus = async (req, res) => {
                         Rate: "8%",
                         ForwardedValue: subtractForwardValue
                     }).save()
-
-
 
 
                     const findShortRecord = await ShortRecord.findOne({ RecordOwner: FindAllUsers[index]._id })
@@ -245,6 +203,7 @@ exports.MatchingBonus = async (req, res) => {
                     }
 
 
+                    await PackageHistory.findOneAndUpdate({_id:FindMainUserPackage._id},{Type2:"Basic"})
 
 
 
@@ -253,9 +212,168 @@ exports.MatchingBonus = async (req, res) => {
 
 
 
+
+
+                } else {
+
+                    console.log("Not Eligibal For Matching")
+
+                }
+            }
+
+
+
+
+
+
+
+        } else {
+
+            console.log("came in this")
+
+
+            if (FindMainUserPackage !== null) {
+
+                if (checkIfUserAlreadyOwnAnyMatchingBonus !== null) {
+                    var subLastValue = Number(checkIfUserAlreadyOwnAnyMatchingBonus.ForwardedValue)
+                } else {
+                    var subLastValue = 0
                 }
 
 
+                var PackPrice = FindMainUserPackage.PackagePrice
+
+
+                const findUserDirects = await User.find({ UpperlineUser: FindAllUsers[index]._id })
+
+                if (findUserDirects.length !== 0) {
+
+                    var LeftWall = 0
+                    var LeftWallId = ""
+                    var RightWall = 0
+                    var RightWallId = ""
+
+                    for (let index = 0; index < findUserDirects.length; index++) {
+
+                        if (findUserDirects[index].Position == "Right") {
+
+                            LeftWall = LeftWall + Number(findUserDirects[index].PurchasedPackagePrice)
+                            LeftWallId = findUserDirects[index]._id
+                        }
+                        if (findUserDirects[index].Position == "Left") {
+
+                            RightWall = RightWall + Number(findUserDirects[index].PurchasedPackagePrice)
+                            RightWallId = findUserDirects[index]._id
+
+                        }
+                    }
+                }
+
+                if (LeftWall >= Number(PackPrice) && RightWall >= Number(PackPrice)) {
+
+
+
+
+
+
+
+
+
+
+                    // this is second loop we are checking
+
+
+
+                    // const findThisUserData = await User.findById(FindAllUsers[index]._id)
+
+                    const currentUserBussiness = await findTotalBussiness(FindAllUsers[index]._id, totalBussinessCache);
+
+                    // 
+
+
+
+                    let leftBusiness = currentUserBussiness.data.leftIncome
+                    let rightBusiness = currentUserBussiness.data.rightIncome
+
+
+
+
+
+
+
+
+                    if (leftBusiness >= Number(PackPrice) && rightBusiness >= Number(PackPrice)) {
+
+
+                        var combo = 0
+
+                        if (leftBusiness < rightBusiness) {
+
+
+
+
+                            combo = Number(leftBusiness) + Number(subLastValue)
+                            var subtractForwardValue = rightBusiness - leftBusiness
+
+                        } else if (rightBusiness < leftBusiness) {
+
+
+                            combo = Number(rightBusiness) + Number(subLastValue)
+                            var subtractForwardValue = leftBusiness - rightBusiness
+
+                        } else if (rightBusiness == leftBusiness) {
+
+
+                            combo = Number(rightBusiness)
+                            var subtractForwardValue = 0
+
+                        }
+
+                        var packPercantage = Number(combo) * 8 / 100
+
+                        const GiveMatchingBonus = await User.findById(FindAllUsers[index]._id)
+
+                        const userWallet = Number(GiveMatchingBonus.MainWallet) + Number(packPercantage)
+
+                        const ProvideMatchingBonus = await User.findByIdAndUpdate({ _id: FindAllUsers[index]._id }, { MainWallet: userWallet })
+
+                        const CreateRecord = await MatchingBonusHistory({
+                            BonusOwner: FindAllUsers[index]._id,
+                            Amount: packPercantage,
+                            Matching: combo,
+                            Rate: "8%",
+                            ForwardedValue: subtractForwardValue
+                        }).save()
+
+
+                        const findShortRecord = await ShortRecord.findOne({ RecordOwner: FindAllUsers[index]._id })
+
+
+                        if (findShortRecord) {
+
+                            let sum = Number(findShortRecord.MatcingBonus) + Number(packPercantage)
+
+                            const updateValue = await ShortRecord.findByIdAndUpdate({ _id: findShortRecord._id }, { MatcingBonus: sum })
+
+                        } else {
+
+                            const createShortRecord = await ShortRecord({
+                                RecordOwner: FindAllUsers[index]._id,
+                                MatcingBonus: packPercantage
+                            }).save()
+
+                        }
+
+
+
+
+
+
+
+
+
+
+                    }
 
 
 
@@ -268,11 +386,16 @@ exports.MatchingBonus = async (req, res) => {
 
 
 
-            } else {
 
-                console.log("No he is not eligible for matching bonus")
+
+                } else {
+
+
+                }
             }
+
         }
+
     }
 
     res.json("done")
